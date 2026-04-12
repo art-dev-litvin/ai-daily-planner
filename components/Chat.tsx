@@ -15,11 +15,12 @@ import { useChat } from "@ai-sdk/react";
 import React from "react";
 import Message from "./Message";
 import { Skeleton } from "./ui/skeleton";
+import EmptyChatContent from "./EmptyChatContent";
 
 export function ChatUI() {
   const [promptValue, setPromptValue] = React.useState("");
 
-  const { messages, status, sendMessage } = useChat();
+  const { messages, status, error, sendMessage, regenerate } = useChat();
 
   const handleSendMessage = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +33,6 @@ export function ChatUI() {
       setPromptValue("");
     }
   };
-  console.log(JSON.stringify(messages));
 
   return (
     <Card className="flex flex-col h-full shadow-sm">
@@ -46,6 +46,10 @@ export function ChatUI() {
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full p-6">
           <div className="flex flex-col gap-4">
+            {messages.length === 0 && status === "ready" && (
+              <EmptyChatContent setPromptValue={setPromptValue} />
+            )}
+
             {messages.map((message) => (
               <Message message={message} key={message.id} />
             ))}
@@ -67,11 +71,32 @@ export function ChatUI() {
         </ScrollArea>
       </CardContent>
 
+      {error && (
+        <div className="px-4 pb-2">
+          <div className="bg-destructive/15 border border-destructive text-destructive px-4 py-2 rounded-md text-xs flex justify-between items-center">
+            <span>
+              <strong>Error:</strong> {error?.message || "Something went wrong"}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => regenerate()}
+              className="h-7 px-2 underline hover:bg-red-100 hover:text-destructive">
+              Try again
+            </Button>
+          </div>
+        </div>
+      )}
+
       <CardFooter className="p-4 border-t">
         <form
           onSubmit={handleSendMessage}
           className="flex w-full items-center space-x-2">
-          <Button variant="outline" size="icon" className="shrink-0">
+          <Button
+            disabled={status === "streaming" || status === "submitted"}
+            variant="outline"
+            size="icon"
+            className="shrink-0">
             <Paperclip className="w-4 h-4" />
             <span className="sr-only">Attach file</span>
           </Button>
@@ -81,9 +106,14 @@ export function ChatUI() {
             type="text"
             placeholder="Type your message or paste an image..."
             className="flex-1"
+            disabled={status === "streaming" || status === "submitted"}
           />
           <Button
-            disabled={!promptValue.trim()}
+            disabled={
+              !promptValue.trim() ||
+              status === "streaming" ||
+              status === "submitted"
+            }
             size="icon"
             className="shrink-0">
             <Send className="w-4 h-4" />
