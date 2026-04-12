@@ -1,8 +1,8 @@
-import { streamText } from "ai";
+import { convertToModelMessages, streamText } from "ai";
 import { google } from "@ai-sdk/google";
 
 export async function POST(request: Request) {
-  const { prompt } = await request.json();
+  const { messages } = await request.json();
 
   const systemPrompt = `
       You are a concise and helpful AI Daily Planner. Your primary goal is to help the user organize their day, prioritize tasks, and manage their schedule efficiently.
@@ -22,8 +22,8 @@ export async function POST(request: Request) {
   const result = streamText({
     model: google("gemini-3-flash-preview"),
     system: systemPrompt,
-    prompt,
+    messages: await convertToModelMessages(messages),
   });
 
-  return result.toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
