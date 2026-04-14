@@ -69,6 +69,7 @@ export function ChatUI() {
         console.log(error),
       );
 
+      filesPreview.forEach((preview) => URL.revokeObjectURL(preview));
       setPromptValue("");
       setUploadedFiles([]);
       setFilesPreview([]);
