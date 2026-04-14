@@ -10,28 +10,105 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Paperclip, Send, Bot } from "lucide-react";
+import { Paperclip, Send, Bot, XIcon } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import React from "react";
 import Message from "./Message";
 import { Skeleton } from "./ui/skeleton";
 import EmptyChatContent from "./EmptyChatContent";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { VisuallyHidden } from "radix-ui";
 
 export function ChatUI() {
   const [promptValue, setPromptValue] = React.useState("");
+  const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([]);
+  const [filesPreview, setFilesPreview] = React.useState<string[]>([]);
+  const [selectedImagePreview, setSelectedImagePreview] = React.useState<
+    string | null
+  >(null);
+  const [imagePreviewModalOpen, setImagePreviewModalOpen] =
+    React.useState(false);
 
   const { messages, status, error, sendMessage, regenerate } = useChat();
+
+  const filesPreviewRef = React.useRef<string[]>([]);
+  React.useEffect(() => {
+    filesPreviewRef.current = filesPreview;
+  }, [filesPreview]);
+
+  React.useEffect(() => {
+    return () => {
+      filesPreviewRef.current.forEach((preview) =>
+        URL.revokeObjectURL(preview),
+      );
+    };
+  }, []);
 
   const handleSendMessage = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (promptValue.trim()) {
-      sendMessage({ files: [], text: promptValue }).catch((error) =>
+    const hasText = promptValue.trim().length > 0;
+    const hasFiles = uploadedFiles.length > 0;
+
+    if (hasText || hasFiles) {
+      let files: FileList | undefined = undefined;
+
+      if (hasFiles) {
+        const dataTransfer = new DataTransfer();
+        uploadedFiles.forEach((file) => dataTransfer.items.add(file));
+        files = dataTransfer.files;
+      }
+
+      sendMessage({ files: files, text: promptValue }).catch((error) =>
         console.log(error),
       );
 
       setPromptValue("");
+      setUploadedFiles([]);
+      setFilesPreview([]);
     }
+  };
+
+  const handleUploadFiles = (
+    e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+  ) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+
+    setUploadedFiles((prev) => [...prev, ...newFiles]);
+    setFilesPreview((prev) => [...prev, ...newPreviews]);
+
+    e.target.value = "";
+  };
+
+  const onOpenPreviewModal = (preview: string) => {
+    setSelectedImagePreview(preview);
+    setImagePreviewModalOpen(true);
+  };
+  const onClosePreviewModal = () => {
+    setSelectedImagePreview(null);
+    setImagePreviewModalOpen(false);
+  };
+
+  const handleRemoveFile = (indexToRemove: number) => {
+    URL.revokeObjectURL(filesPreview[indexToRemove]);
+
+    setUploadedFiles((prev) =>
+      prev.filter((_, index) => index !== indexToRemove),
+    );
+
+    setFilesPreview((prev) =>
+      prev.filter((_, index) => index !== indexToRemove),
+    );
   };
 
   return (
@@ -88,18 +165,79 @@ export function ChatUI() {
         </div>
       )}
 
-      <CardFooter className="p-4 border-t">
+      <CardFooter className="relative p-4 border-t">
         <form
           onSubmit={handleSendMessage}
           className="flex w-full items-center space-x-2">
           <Button
+            type="button"
             disabled={status === "streaming" || status === "submitted"}
             variant="outline"
             size="icon"
             className="shrink-0">
-            <Paperclip className="w-4 h-4" />
-            <span className="sr-only">Attach file</span>
+            <label
+              className="size-full flex justify-center items-center"
+              htmlFor="chat-file-upload">
+              <Paperclip className="w-4 h-4" />
+            </label>
           </Button>
+          <input
+            multiple
+            onChange={handleUploadFiles}
+            disabled={status === "streaming" || status === "submitted"}
+            id="chat-file-upload"
+            type="file"
+            accept="image/png, image/jpeg, image/webp"
+            className="sr-only"
+            aria-label="Upload image"
+          />
+
+          <div className="flex gap-2 absolute -translate-y-full -top-1 left-4">
+            {filesPreview.map((preview, i) => (
+              <div
+                key={preview}
+                className="group rounded-sm size-14 overflow-hidden relative">
+                <Button
+                  onClick={() => handleRemoveFile(i)}
+                  variant="ghost"
+                  className="group-hover:opacity-100 z-10 opacity-0 rounded-full bg-black/70 hover:bg-black size-6 absolute right-0.5 top-0.5">
+                  <XIcon className="text-white" />
+                </Button>
+                <Image
+                  onClick={() => onOpenPreviewModal(preview)}
+                  className="cursor-pointer w-full object-cover"
+                  src={preview}
+                  fill
+                  alt={"preview-" + i}
+                />
+              </div>
+            ))}
+          </div>
+
+          <Dialog
+            onOpenChange={onClosePreviewModal}
+            open={imagePreviewModalOpen}>
+            <VisuallyHidden.Root>
+              <DialogTitle>Uploaded image preview</DialogTitle>
+              <DialogDescription>
+                View the image before sending it to the chat.
+              </DialogDescription>
+            </VisuallyHidden.Root>
+            <DialogContent
+              closeButtonClassName="[&_svg]:size-10! bg-black/70 [&_svg]:text-white hover:[&_svg]:text-black size-auto top-5 right-5"
+              className="h-11/12 max-w-175!">
+              {selectedImagePreview && (
+                <Image
+                  className="size-full object-cover rounded-md"
+                  src={selectedImagePreview}
+                  alt="Image preview"
+                  width={100}
+                  height={100}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
+
           <Input
             value={promptValue}
             onChange={(e) => setPromptValue(e.target.value)}
@@ -109,8 +247,9 @@ export function ChatUI() {
             disabled={status === "streaming" || status === "submitted"}
           />
           <Button
+            type="submit"
             disabled={
-              !promptValue.trim() ||
+              (!promptValue.trim() && uploadedFiles.length === 0) ||
               status === "streaming" ||
               status === "submitted"
             }
