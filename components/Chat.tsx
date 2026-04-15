@@ -125,7 +125,10 @@ export function ChatUI() {
         <ScrollArea className="h-full p-6">
           <div className="flex flex-col gap-4">
             {messages.length === 0 && status === "ready" && (
-              <EmptyChatContent setPromptValue={setPromptValue} />
+              <EmptyChatContent
+                onUploadFiles={handleUploadFiles}
+                setPromptValue={setPromptValue}
+              />
             )}
 
             {messages.map((message) => (

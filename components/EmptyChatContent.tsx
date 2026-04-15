@@ -3,9 +3,15 @@ import { Button } from "./ui/button";
 
 interface EmptyChatContentProps {
   setPromptValue: React.Dispatch<React.SetStateAction<string>>;
+  onUploadFiles: (
+    e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+  ) => void;
 }
 
-function EmptyChatContent({ setPromptValue }: EmptyChatContentProps) {
+function EmptyChatContent({
+  setPromptValue,
+  onUploadFiles,
+}: EmptyChatContentProps) {
   return (
     <div className="flex flex-col items-center justify-center flex-1 py-12 text-center animate-in fade-in duration-500">
       <div className="bg-primary/10 p-4 rounded-full mb-4">
@@ -39,13 +45,24 @@ function EmptyChatContent({ setPromptValue }: EmptyChatContentProps) {
 
         <Button
           variant="outline"
-          className="h-auto py-3 px-4 justify-start text-left bg-background/50"
-          onClick={() => {
-            /* Trigger file input logic */
-          }}>
-          <ImagePlus className="mr-3 h-4 w-4 text-primary" />
-          <span className="text-sm">Scan image for to-dos</span>
+          className="h-auto justify-start py-3 px-4 text-left bg-background/50"
+          onClick={() => {}}>
+          <label className="flex gap-1.5" htmlFor="empty-chat-file-upload">
+            <ImagePlus className="mr-3 h-4 w-4 text-primary" />
+            <span className="text-sm">Scan image for to-dos</span>
+          </label>
         </Button>
+
+        <input
+          multiple
+          onChange={onUploadFiles}
+          disabled={status === "streaming" || status === "submitted"}
+          id="empty-chat-file-upload"
+          type="file"
+          accept="image/png, image/jpeg, image/webp"
+          className="sr-only"
+          aria-label="Upload image"
+        />
       </div>
     </div>
   );
