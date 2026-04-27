@@ -48,8 +48,8 @@ function EmptyChatContent({
 
         <Button
           variant="outline"
-          className="h-auto justify-start py-3 px-4 text-left bg-background/50"
-          onClick={() => {}}>
+          asChild
+          className="h-auto justify-start py-3 px-4 text-left bg-background/50">
           <label className="flex gap-1.5" htmlFor="empty-chat-file-upload">
             <ImagePlus className="mr-3 h-4 w-4 text-primary" />
             <span className="text-sm">Scan image for to-dos</span>
