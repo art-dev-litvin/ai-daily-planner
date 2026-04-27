@@ -1,16 +1,19 @@
 import { ListChecks, CalendarPlus, Sparkles, ImagePlus } from "lucide-react";
 import { Button } from "./ui/button";
+import { ChatStatus } from "ai";
 
 interface EmptyChatContentProps {
   setPromptValue: React.Dispatch<React.SetStateAction<string>>;
   onUploadFiles: (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
   ) => void;
+  chatStatus: ChatStatus;
 }
 
 function EmptyChatContent({
   setPromptValue,
   onUploadFiles,
+  chatStatus,
 }: EmptyChatContentProps) {
   return (
     <div className="flex flex-col items-center justify-center flex-1 py-12 text-center animate-in fade-in duration-500">
@@ -56,7 +59,7 @@ function EmptyChatContent({
         <input
           multiple
           onChange={onUploadFiles}
-          disabled={status === "streaming" || status === "submitted"}
+          disabled={chatStatus === "streaming" || chatStatus === "submitted"}
           id="empty-chat-file-upload"
           type="file"
           accept="image/png, image/jpeg, image/webp"
