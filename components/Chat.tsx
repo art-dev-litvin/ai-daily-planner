@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Bot } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
@@ -105,7 +104,11 @@ export function ChatUI() {
               handleUploadFiles={handleUploadFiles}
             />
 
-            <ChatInput prompt={prompt} handlePasteImage={handlePasteImage} />
+            <ChatInput
+              prompt={prompt}
+              setPrompt={setPrompt}
+              handlePasteImage={handlePasteImage}
+            />
 
             <Button
               type="submit"
