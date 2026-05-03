@@ -17,7 +17,7 @@ interface ChatListProps {
   handleUploadFiles: (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
   ) => void;
-  setPromptValue: React.Dispatch<React.SetStateAction<string>>;
+  setPrompt: React.Dispatch<React.SetStateAction<string>>;
   regenerate: () => Promise<void>;
 }
 
@@ -27,7 +27,7 @@ function ChatList({
   error,
   regenerate,
   handleUploadFiles,
-  setPromptValue,
+  setPrompt,
 }: ChatListProps) {
   return (
     <>
@@ -38,7 +38,7 @@ function ChatList({
               <EmptyChatContent
                 chatStatus={chatStatus}
                 onUploadFiles={handleUploadFiles}
-                setPromptValue={setPromptValue}
+                setPrompt={setPrompt}
               />
             )}
 

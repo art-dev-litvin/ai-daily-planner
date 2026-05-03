@@ -17,10 +17,11 @@ import { VisuallyHidden } from "radix-ui";
 import { useFileAttachments } from "@/app/hooks/useFileAttachments";
 import ChatList from "./ChatList";
 import AttachmentBar from "./AttachmentBar";
+import ChatInput from "./ChatInput";
 //import { mockedMessages } from "@/app/mock/mockedMessages";
 
 export function ChatUI() {
-  const [promptValue, setPromptValue] = React.useState("");
+  const [prompt, setPrompt] = React.useState("");
 
   const [selectedImagePreview, setSelectedImagePreview] = React.useState<
     string | null
@@ -42,7 +43,7 @@ export function ChatUI() {
   const handleSendMessage = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const hasText = promptValue.trim().length > 0;
+    const hasText = prompt.trim().length > 0;
     const hasFiles = uploadedFiles.length > 0;
 
     if (hasText || hasFiles) {
@@ -54,12 +55,12 @@ export function ChatUI() {
         files = dataTransfer.files;
       }
 
-      sendMessage({ files: files, text: promptValue }).catch((error) =>
+      sendMessage({ files: files, text: prompt }).catch((error) =>
         console.log(error),
       );
 
       filesPreview.forEach((preview) => URL.revokeObjectURL(preview));
-      setPromptValue("");
+      setPrompt("");
       cleanFilesAndPreviews();
     }
   };
@@ -89,7 +90,7 @@ export function ChatUI() {
           messages={messages}
           regenerate={regenerate}
           handleUploadFiles={handleUploadFiles}
-          setPromptValue={setPromptValue}
+          setPrompt={setPrompt}
         />
 
         <CardFooter className="relative p-4 border-t">
@@ -104,19 +105,12 @@ export function ChatUI() {
               handleUploadFiles={handleUploadFiles}
             />
 
-            <Input
-              value={promptValue}
-              onChange={(e) => setPromptValue(e.target.value)}
-              onPaste={handlePasteImage}
-              type="text"
-              placeholder="Type your message or paste an image..."
-              className="flex-1"
-              disabled={status === "streaming" || status === "submitted"}
-            />
+            <ChatInput prompt={prompt} handlePasteImage={handlePasteImage} />
+
             <Button
               type="submit"
               disabled={
-                (!promptValue.trim() && uploadedFiles.length === 0) ||
+                (!prompt.trim() && uploadedFiles.length === 0) ||
                 status === "streaming" ||
                 status === "submitted"
               }

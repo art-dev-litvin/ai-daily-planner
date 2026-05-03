@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { ChatStatus } from "ai";
 
 interface EmptyChatContentProps {
-  setPromptValue: React.Dispatch<React.SetStateAction<string>>;
+  setPrompt: React.Dispatch<React.SetStateAction<string>>;
   onUploadFiles: (
     e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
   ) => void;
@@ -11,7 +11,7 @@ interface EmptyChatContentProps {
 }
 
 function EmptyChatContent({
-  setPromptValue,
+  setPrompt,
   onUploadFiles,
   chatStatus,
 }: EmptyChatContentProps) {
@@ -33,7 +33,7 @@ function EmptyChatContent({
         <Button
           variant="outline"
           className="h-auto py-3 px-4 justify-start text-left bg-background/50"
-          onClick={() => setPromptValue("What are my tasks for today?")}>
+          onClick={() => setPrompt("What are my tasks for today?")}>
           <ListChecks className="mr-3 h-4 w-4 text-primary" />
           <span className="text-sm">Check today&apos;s schedule</span>
         </Button>
@@ -41,7 +41,7 @@ function EmptyChatContent({
         <Button
           variant="outline"
           className="h-auto py-3 px-4 justify-start text-left bg-background/50"
-          onClick={() => setPromptValue("Add a new task: ")}>
+          onClick={() => setPrompt("Add a new task: ")}>
           <CalendarPlus className="mr-3 h-4 w-4 text-primary" />
           <span className="text-sm">Add a new priority task</span>
         </Button>
