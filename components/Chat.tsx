@@ -107,6 +107,7 @@ export function ChatUI() {
             <ChatInput
               prompt={prompt}
               setPrompt={setPrompt}
+              chatStatus={status}
               handlePasteImage={handlePasteImage}
             />
 
