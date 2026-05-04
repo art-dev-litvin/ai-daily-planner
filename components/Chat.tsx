@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
-import { useFileAttachments } from "@/app/hooks/useFileAttachments";
+import { useFileAttachments } from "@/hooks/useFileAttachments";
 import ChatList from "./ChatList";
 import AttachmentBar from "./AttachmentBar";
 import ChatInput from "./ChatInput";
