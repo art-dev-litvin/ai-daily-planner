@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Card,
@@ -11,7 +10,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, Sparkles, Plus } from "lucide-react";
+import { Trash2, Sparkles } from "lucide-react";
+import CreateTaskForm from "./CreateTaskForm";
 
 export function TaskPanelUI() {
   return (
@@ -21,25 +21,7 @@ export function TaskPanelUI() {
       </CardHeader>
 
       <CardContent className="flex flex-col flex-1 p-6 overflow-hidden gap-6">
-        {/* Add Task Form */}
-        <div className="flex gap-2 items-start">
-          <div className="flex-1 space-y-2">
-            <Input placeholder="Task title..." className="w-full" />
-            <div className="flex gap-2">
-              <Input
-                placeholder="Time (e.g. 14:00)"
-                className="w-1/3 text-sm"
-              />
-              {/* Priority placeholder, normally a Select component */}
-              <div className="flex-1 border rounded-md px-3 py-2 text-sm text-muted-foreground flex items-center">
-                Select Priority...
-              </div>
-            </div>
-          </div>
-          <Button size="icon" className="shrink-0 mt-1">
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
+        <CreateTaskForm />
 
         <Separator />
 
